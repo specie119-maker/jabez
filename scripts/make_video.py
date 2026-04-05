@@ -1,36 +1,48 @@
 import os
 import subprocess
+import sys
 
-# 로그에 이게 안 찍히면 코드가 안 바뀐 겁니다!
-print("--- [ULTIMATE CHECK] STARTING VIDEO GENERATION ---")
+print("--- [FORCED CHECK] STARTING VIDEO GENERATION ---")
 
-# 현재 파일 위치를 기준으로 루트 폴더 주소 계산
-current_file = os.path.abspath(__file__)
-scripts_dir = os.path.dirname(current_file)
-root_dir = os.path.dirname(scripts_dir)
+# 현재 실행 경로와 파일 위치를 로그로 찍어서 확인
+current_working_dir = os.getcwd()
+script_location = os.path.dirname(os.path.abspath(__file__))
+root_dir = os.path.dirname(script_location)
 
-# 파일 절대 경로 완성
-img = os.path.join(root_dir, 'assets', 'image.jpg')
-aud = os.path.join(root_dir, 'assets', 'music.mp3')
-out = os.path.join(root_dir, 'output.mp4')
+print(f"--- [DEBUG] Working Dir: {current_working_dir}")
+print(f"--- [DEBUG] Script Location: {script_location}")
+print(f"--- [DEBUG] Root Dir: {root_dir}")
 
-print(f"--- [ULTIMATE CHECK] IMAGE PATH: {img}")
-print(f"--- [ULTIMATE CHECK] MUSIC PATH: {aud}")
+# 서버 환경에서 절대 경로를 강제로 지정
+image_path = os.path.join(root_dir, 'assets', 'image.jpg')
+music_path = os.path.join(root_dir, 'assets', 'music.mp3')
+output_path = os.path.join(root_dir, 'output.mp4')
 
-# FFmpeg 명령어 (따옴표 없이 변수 이름만!)
+# 파일이 진짜 존재하는지 체크
+if not os.path.exists(image_path):
+    print(f"--- [CRITICAL ERROR] IMAGE NOT FOUND AT: {image_path}")
+    # 폴더 안의 파일 목록을 출력해서 진짜 위치를 찾음
+    if os.path.exists(os.path.join(root_dir, 'assets')):
+        print(f"Files in assets: {os.listdir(os.path.join(root_dir, 'assets'))}")
+    sys.exit(1)
+
+print(f"--- [FORCED CHECK] IMAGE PATH: {image_path}")
+print(f"--- [FORCED CHECK] MUSIC PATH: {music_path}")
+
 cmd = [
     'ffmpeg', '-y', '-loop', '1', 
-    '-i', img, 
-    '-i', aud, 
+    '-i', image_path, 
+    '-i', music_path, 
     '-c:v', 'libx264', '-tune', 'stillimage', 
     '-c:a', 'aac', '-b:a', '192k', 
     '-pix_fmt', 'yuv420p', '-shortest', 
-    out
+    output_path
 ]
 
 try:
+    print("--- [EXECUTING FFMPEG] ---")
     subprocess.run(cmd, check=True)
-    print("--- [SUCCESS] VIDEO CREATED! ---")
+    print("--- [SUCCESS] VIDEO CREATED SUCCESSFULLY! ---")
 except Exception as e:
-    print(f"--- [ERROR] FAILED: {e}")
-    raise e
+    print(f"--- [ERROR] FFmpeg failed: {e}")
+    sys.exit(1)
