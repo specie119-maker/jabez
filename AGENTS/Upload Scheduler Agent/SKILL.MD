@@ -1,5 +1,4 @@
-# Upload Scheduler Agent
-
+# upload-scheduler/SKILL.md
 ## Channel Information
 
 Channel Name: SAVANNA SOUNDS
