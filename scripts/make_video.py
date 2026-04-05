@@ -1,11 +1,8 @@
-import os
 import subprocess
 
-base_dir = os.getcwd()
-
-image = os.path.join(base_dir, "assets/image.jpg")
-audio = os.path.join(base_dir, "assets/music.mp3")
-output = os.path.join(base_dir, "output.mp4")
+image = "assets/image.jpg"
+audio = "assets/music.mp3"
+output = "output.mp4"
 
 cmd = [
     "ffmpeg",
@@ -21,6 +18,9 @@ cmd = [
     output
 ]
 
-subprocess.run(cmd, check=True)
+result = subprocess.run(cmd, text=True, capture_output=True)
+print(result.stdout)
+print(result.stderr)
+result.check_returncode()
 
 print("Video Created")
