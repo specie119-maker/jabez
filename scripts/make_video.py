@@ -19,6 +19,6 @@ cmd = [
     output
 ]
 
-subprocess.run(cmd)
+subprocess.run(cmd, check=True)
 
 print("Video Created")
