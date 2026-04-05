@@ -1,3 +1,5 @@
+print("NEW VERSION RUNNING")
+
 import os
 import subprocess
 
@@ -38,5 +40,3 @@ result = subprocess.run(cmd, text=True, capture_output=True)
 print(result.stdout)
 print(result.stderr)
 result.check_returncode()
-
-print("NEW VERSION RUNNING")
