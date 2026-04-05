@@ -1,14 +1,15 @@
 import os
 import subprocess
 
+# 로그에 이게 안 찍히면 코드가 안 바뀐 겁니다!
 print("--- [ULTIMATE CHECK] STARTING VIDEO GENERATION ---")
 
-# 현재 파일 위치를 기준으로 절대 경로를 계산합니다.
+# 현재 파일 위치를 기준으로 루트 폴더 주소 계산
 current_file = os.path.abspath(__file__)
 scripts_dir = os.path.dirname(current_file)
 root_dir = os.path.dirname(scripts_dir)
 
-# 파일 경로 (절대 경로로 완성)
+# 파일 절대 경로 완성
 img = os.path.join(root_dir, 'assets', 'image.jpg')
 aud = os.path.join(root_dir, 'assets', 'music.mp3')
 out = os.path.join(root_dir, 'output.mp4')
@@ -16,7 +17,7 @@ out = os.path.join(root_dir, 'output.mp4')
 print(f"--- [ULTIMATE CHECK] IMAGE PATH: {img}")
 print(f"--- [ULTIMATE CHECK] MUSIC PATH: {aud}")
 
-# FFmpeg 명령어 (변수 이름을 따옴표 없이 넣으세요!)
+# FFmpeg 명령어 (따옴표 없이 변수 이름만!)
 cmd = [
     'ffmpeg', '-y', '-loop', '1', 
     '-i', img, 
