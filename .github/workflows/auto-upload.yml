@@ -30,7 +30,7 @@ jobs:
           pip install google-auth-oauthlib
 
       - name: Run Video Generator
-        run: python scripts/make_video_v2.py
+        run: python scripts/make_video.py
 
       - name: Upload YouTube
         run: python scripts/upload_youtube.py
