@@ -1,9 +1,11 @@
 import os
 import subprocess
 
-image = "assets/image.jpg"
-audio = "assets/music.mp3"
-output = "output.mp4"
+base_dir = os.getcwd()
+
+image = os.path.join(base_dir, "assets/image.jpg")
+audio = os.path.join(base_dir, "assets/music.mp3")
+output = os.path.join(base_dir, "output.mp4")
 
 cmd = [
     "ffmpeg",
