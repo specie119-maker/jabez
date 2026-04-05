@@ -1,7 +1,7 @@
 import os
 import subprocess
 
-base_dir = os.getcwd()
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 image = os.path.join(base_dir, "assets", "image.jpg")
 audio = os.path.join(base_dir, "assets", "music.mp3")
