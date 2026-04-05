@@ -1,1 +1,36 @@
+name: SAVANNA SOUNDS Auto Upload
 
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *'
+
+jobs:
+  build-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install dependencies
+        run: |
+          pip install google-api-python-client
+          pip install google-auth-httplib2
+          pip install google-auth-oauthlib
+
+      - name: Run Video Generator
+        run: python scripts/make_video.py
+
+      - name: Upload YouTube
+        run: python scripts/upload_youtube.py
