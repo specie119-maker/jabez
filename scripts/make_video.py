@@ -1,21 +1,24 @@
 import os
 import subprocess
 
-print("NEW VERSION RUNNING")
+print("--- STARTING VIDEO GENERATION ---")
 
-# 1. 경로 설정: scripts 폴더의 상위인 '루트 폴더'를 기준으로 잡습니다.
-base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# 현재 스크립트 파일의 위치: /home/runner/work/jabez/jabez/scripts/make_video.py
+# 루트 폴더 위치를 절대 경로로 잡기
+current_script_path = os.path.abspath(__file__)
+scripts_dir = os.path.dirname(current_script_path)
+root_dir = os.path.dirname(scripts_dir)
 
-# 2. 파일들의 절대 경로를 변수에 담습니다. (따옴표 주의!)
-image_path = os.path.join(base_dir, 'assets', 'image.jpg')
-music_path = os.path.join(base_dir, 'assets', 'music.mp3')
-output_path = os.path.join(base_dir, 'output.mp4')
+# 파일 경로를 절대 경로로 완성
+image_path = os.path.join(root_dir, 'assets', 'image.jpg')
+music_path = os.path.join(root_dir, 'assets', 'music.mp3')
+output_path = os.path.join(root_dir, 'output.mp4')
 
-# 3. 경로가 잘 잡혔는지 로그에 출력해봅니다.
-print(f"Image path: {image_path}")
-print(f"Music path: {music_path}")
+print(f"Working Directory: {os.getcwd()}")
+print(f"Looking for image at: {image_path}")
+print(f"Looking for music at: {music_path}")
 
-# 4. FFmpeg 명령어 설정 (변수 이름을 따옴표 없이 넣어야 합니다!)
+# FFmpeg 명령어 (변수 이름을 따옴표 없이 넣는 것이 핵심!)
 cmd = [
     'ffmpeg', 
     '-y', 
@@ -28,12 +31,12 @@ cmd = [
     '-b:a', '192k', 
     '-pix_fmt', 'yuv420p', 
     '-shortest', 
-    output_path          # 변수 사용
+    output_path
 ]
 
-# 5. 실행
 try:
-    subprocess.run(cmd, check=True)
-    print("비디오 제작 완료!")
+    result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+    print("SUCCESS: Video created at", output_path)
 except subprocess.CalledProcessError as e:
-    print(f"오류 발생: {e}")
+    print("FFmpeg Error Output:", e.stderr)
+    raise e
