@@ -3,9 +3,22 @@ import subprocess
 
 base_dir = os.getcwd()
 
-image = os.path.join(base_dir, "assets/image.jpg")
-audio = os.path.join(base_dir, "assets/music.mp3")
+image = os.path.join(base_dir, "assets", "image.jpg")
+audio = os.path.join(base_dir, "assets", "music.mp3")
 output = os.path.join(base_dir, "output.mp4")
+
+print("Current working directory:", base_dir)
+print("Image path:", image)
+print("Audio path:", audio)
+print("Output path:", output)
+print("Image exists:", os.path.exists(image))
+print("Audio exists:", os.path.exists(audio))
+
+assets_dir = os.path.join(base_dir, "assets")
+if os.path.isdir(assets_dir):
+    print("Assets folder contents:", os.listdir(assets_dir))
+else:
+    print("Assets folder not found")
 
 cmd = [
     "ffmpeg",
@@ -21,6 +34,9 @@ cmd = [
     output
 ]
 
-subprocess.run(cmd, check=True)
+result = subprocess.run(cmd, text=True, capture_output=True)
+print(result.stdout)
+print(result.stderr)
+result.check_returncode()
 
 print("Video Created")
