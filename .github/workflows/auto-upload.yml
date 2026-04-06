@@ -25,16 +25,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install google-api-python-client
-          pip install google-auth-httplib2
-          pip install google-auth-oauthlib
+          pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
       - name: Run Video Generator
         run: python scripts/make_video_final.py
+
       - name: Upload YouTube
         run: python scripts/upload_youtube.py
 
-- name: Upload Video Artifact
+      - name: Upload Video Artifact
         uses: actions/upload-artifact@v4
         with:
           name: completed-video
