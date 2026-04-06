@@ -33,3 +33,10 @@ jobs:
         run: python scripts/make_video_final.py
       - name: Upload YouTube
         run: python scripts/upload_youtube.py
+
+- name: Upload Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: completed-video
+          path: output.mp4
+          retention-days: 1
