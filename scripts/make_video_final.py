@@ -47,34 +47,55 @@ if HAS_PILLOW:
         selected_font_path = random.choice(font_options)
         print(f"--- [INFO] 선택된 폰트: {selected_font_path} ---")
         
+        # 롱폼/쇼츠에 따라 텍스트 줄바꿈 및 안전 가이드라인(Safe width) 설정
+        if args.type == 'short':
+            text = "AFRICAN\nCHILL\nJAZZ"  # 쇼츠용 세로형 줄바꿈 (3줄)
+            safe_width = int(image.height * (9/16))  # 중앙 크롭 영역의 너비
+        else:
+            text = "AFRICAN CHILL JAZZ"
+            safe_width = image.width
+
         try:
-            # 해상도에 맞게 폰트 크기 조정
-            font_size = int(image.height * 0.08)
+            # 폰트 크기를 화면에 꽉 차지 않도록 동적 제한 (안전 너비의 80%)
+            max_text_width = int(safe_width * 0.8)
+            font_size = int(image.height * 0.08) # 기본 크기
             font = ImageFont.truetype(selected_font_path, font_size)
+            
+            # 실제 텍스트가 최대 너비를 넘으면 폰트 크기를 줄임
+            while True:
+                try:
+                    bbox = draw.textbbox((0, 0), text, font=font)
+                    text_w = bbox[2] - bbox[0]
+                    text_h = bbox[3] - bbox[1]
+                except AttributeError:
+                    text_w, text_h = draw.textsize(text, font=font)
+                
+                if text_w <= max_text_width or font_size < 20:
+                    break
+                font_size -= 2
+                font = ImageFont.truetype(selected_font_path, font_size)
+
         except Exception as e:
             print(f"--- [WARNING] 폰트 로드 실패 ({selected_font_path}), 기본 폰트 사용: {e}")
             font = ImageFont.load_default()
-            
-        text = "AFRICAN CHILL JAZZ"
-        
-        try:
-            bbox = draw.textbbox((0, 0), text, font=font)
-            text_w = bbox[2] - bbox[0]
-            text_h = bbox[3] - bbox[1]
-        except AttributeError:
-            text_w, text_h = draw.textsize(text, font=font)
+            try:
+                bbox = draw.textbbox((0, 0), text, font=font)
+                text_w = bbox[2] - bbox[0]
+                text_h = bbox[3] - bbox[1]
+            except AttributeError:
+                text_w, text_h = draw.textsize(text, font=font)
             
         x = (image.width - text_w) / 2
         y = (image.height - text_h) / 2
         
         # [가독성 강화] 두꺼운 검은색 그림자 (외곽선 느낌)
-        shadow_offset = 6
-        draw.text((x + shadow_offset, y + shadow_offset), text, font=font, fill=(0,0,0))
-        draw.text((x - 2, y - 2), text, font=font, fill=(0,0,0))
-        draw.text((x + 2, y - 2), text, font=font, fill=(0,0,0))
+        shadow_offset = max(3, int(font_size * 0.05)) # 폰트 크기에 비례한 그림자
+        draw.text((x + shadow_offset, y + shadow_offset), text, font=font, fill=(0,0,0), align="center")
+        draw.text((x - 2, y - 2), text, font=font, fill=(0,0,0), align="center")
+        draw.text((x + 2, y - 2), text, font=font, fill=(0,0,0), align="center")
         
         # 본 텍스트 (완전한 흰색)
-        draw.text((x, y), text, font=font, fill=(255,255,255))
+        draw.text((x, y), text, font=font, fill=(255,255,255), align="center")
         
         image.save(temp_img)
         img_to_use = temp_img
