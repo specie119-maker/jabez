@@ -1,0 +1,53 @@
+name: YouTube Channel Automation Daily
+
+on:
+  schedule:
+    # 매일 UTC 기준 00:00 (한국 시간 오전 9시) 자동 실행
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 수동 실행 버튼 활성화
+
+jobs:
+  automate_and_upload:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 1. 저장소 체크아웃
+        uses: actions/checkout@v4
+        
+      - name: 2. Node.js & FFmpeg 세팅
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        
+      - name: 3. Python 세팅
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: 4. 의존성 패키지 설치
+        run: |
+          npm install
+          pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib google-genai
+          
+      - name: 5. 인증 키 및 토큰 복원 (Github Secrets에서)
+        run: |
+          echo '${{ secrets.CLIENT_SECRET }}' > client_secret.json
+          echo '${{ secrets.YOUTUBE_OAUTH_TOKEN }}' > token.json
+          echo '${{ secrets.GEMINI_API_KEY }}' > "제미나이 키.txt"
+          
+      - name: 5.5 AI로 새로운 음악 작곡
+        run: python generate_music_lyria.py
+        
+      - name: 6. 1시간 명상 영상 생성 (FFmpeg)
+        run: node build_real_1hour.js
+        
+      - name: 7. 타임라인(챕터) 파싱 및 추가
+        run: node generate_timeline2.js
+        
+      - name: 8. 유튜브 업로드 실행
+        run: python upload_youtube.py
+        
+      - name: 9. 보안 정보 파기
+        if: always()
+        run: rm -f client_secret.json token.json
