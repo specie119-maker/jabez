@@ -23,6 +23,8 @@ out = os.path.join(base_dir, 'output.mp4')
 print(f"--- [DEBUG] Target Image: {img}")
 print(f"--- [DEBUG] Target Music: {aud}")
 
+import random
+
 # 텍스트가 합성된 임시 이미지 경로
 temp_img = os.path.join(base_dir, 'assets', 'temp_image_text.jpg')
 
@@ -32,17 +34,29 @@ if HAS_PILLOW:
         image = Image.open(img)
         draw = ImageDraw.Draw(image)
         
-        # Windows 기본 폰트 사용 시도
-        font_path = "C:/Windows/Fonts/arialbd.ttf"
+        # Windows 로컬에서 사용할 4~5가지 가독성 좋은 폰트 리스트
+        font_options = [
+            "C:/Windows/Fonts/arialbd.ttf",   # Arial Bold
+            "C:/Windows/Fonts/malgunbd.ttf",  # 맑은 고딕 Bold
+            "C:/Windows/Fonts/impact.ttf",    # Impact
+            "C:/Windows/Fonts/tahoma.ttf",    # Tahoma
+            "C:/Windows/Fonts/trebucbd.ttf"   # Trebuchet MS Bold
+        ]
+        
+        # 무작위로 폰트 하나 선택
+        selected_font_path = random.choice(font_options)
+        print(f"--- [INFO] 선택된 폰트: {selected_font_path} ---")
+        
         try:
             # 해상도에 맞게 폰트 크기 조정
             font_size = int(image.height * 0.08)
-            font = ImageFont.truetype(font_path, font_size)
-        except:
+            font = ImageFont.truetype(selected_font_path, font_size)
+        except Exception as e:
+            print(f"--- [WARNING] 폰트 로드 실패 ({selected_font_path}), 기본 폰트 사용: {e}")
             font = ImageFont.load_default()
             
         text = "AFRICAN CHILL JAZZ"
-        # getbbox(text) is newer, but let's use textbbox
+        
         try:
             bbox = draw.textbbox((0, 0), text, font=font)
             text_w = bbox[2] - bbox[0]
@@ -53,10 +67,13 @@ if HAS_PILLOW:
         x = (image.width - text_w) / 2
         y = (image.height - text_h) / 2
         
-        # 그림자 효과 (검은색)
-        shadow_offset = 5
+        # [가독성 강화] 두꺼운 검은색 그림자 (외곽선 느낌)
+        shadow_offset = 6
         draw.text((x + shadow_offset, y + shadow_offset), text, font=font, fill=(0,0,0))
-        # 본 텍스트 (흰색)
+        draw.text((x - 2, y - 2), text, font=font, fill=(0,0,0))
+        draw.text((x + 2, y - 2), text, font=font, fill=(0,0,0))
+        
+        # 본 텍스트 (완전한 흰색)
         draw.text((x, y), text, font=font, fill=(255,255,255))
         
         image.save(temp_img)
